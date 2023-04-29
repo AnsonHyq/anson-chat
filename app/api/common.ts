@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import FormData from "form-data";
 
 const OPENAI_URL = "api.openai.com";
 const DEFAULT_PROTOCOL = "https";
@@ -22,13 +23,41 @@ export async function requestOpenai(req: NextRequest) {
     console.log("[Org ID]", process.env.OPENAI_ORG_ID);
   }
 
-  return fetch(`${baseUrl}/${openaiPath}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      ...(process.env.OPENAI_ORG_ID && { "OpenAI-Organization": process.env.OPENAI_ORG_ID }),
-    },
-    method: req.method,
-    body: req.body,
-  });
+  if (openaiPath?.match("transcriptions")) {
+    const form = new FormData();
+    form.append("model", "whisper-1");
+    form.append("language", "zh");
+
+    const json = await req.json();
+    const audio64 = json["audio64"];
+    const bytes = Buffer.from(audio64, "base64");
+    form.append(
+      "file",
+      new Blob([bytes], { type: "audio/webm;codecs=opus" }),
+      `${Math.random()}.webm`,
+    );
+
+    return fetch(`${baseUrl}/${openaiPath}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        ...(process.env.OPENAI_ORG_ID && {
+          "OpenAI-Organization": process.env.OPENAI_ORG_ID,
+        }),
+      },
+      method: req.method,
+      body: form,
+    });
+  } else {
+    return fetch(`${baseUrl}/${openaiPath}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        ...(process.env.OPENAI_ORG_ID && {
+          "OpenAI-Organization": process.env.OPENAI_ORG_ID,
+        }),
+      },
+      method: req.method,
+      body: req.body,
+    });
+  }
 }

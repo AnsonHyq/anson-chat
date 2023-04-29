@@ -21,6 +21,11 @@ import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 
+import UploadIcon from "../icons/upload.svg";
+import { ReactMic } from "react-mic";
+
+import { translations } from "../requests";
+
 import {
   Message,
   SubmitKey,
@@ -371,6 +376,7 @@ export function Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
+  const [recordState, setRecordState] = useState(false);
 
   const onChatBodyScroll = (e: HTMLElement) => {
     const isTouchBottom = e.scrollTop + e.clientHeight >= e.scrollHeight - 20;
@@ -576,6 +582,24 @@ export function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [audioText, setAudioText] = useState("发送录音");
+  const onAudioRecord = () => {
+    console.log(`recordState:` + recordState);
+    setAudioText(recordState ? "点击结束录音" : "发送录音");
+    setRecordState(!recordState);
+  };
+  const stopRecord = async (recordedBlob) => {
+    console.log(`recordedBlob  ` + recordedBlob.blob.size);
+    const result = await translations(recordedBlob.blob);
+    await result.body
+      ?.getReader()
+      .read()
+      .then(({ done, value }) => {
+        const buffer = Buffer.from(value);
+        const audioinput = buffer.toString("utf8");
+        setUserInput(JSON.parse(audioinput)["text"]);
+      });
+  };
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header">
@@ -754,6 +778,9 @@ export function Chat() {
             inputRef.current?.focus();
             onSearch("");
           }}
+          // changeUserInput={(text) => {
+          //   setUserInput(text);
+          // }}
         />
         <div className={styles["chat-input-panel-inner"]}>
           <textarea
@@ -781,6 +808,18 @@ export function Chat() {
             className={styles["chat-input-send"]}
             type="primary"
             onClick={onUserSubmit}
+          />
+          <IconButton
+            icon={<SendWhiteIcon />}
+            text={audioText}
+            className={`${styles["chat-input-send"]} ${styles["chat-audio-input"]}`}
+            type="primary"
+            onClick={onAudioRecord}
+          />
+          <ReactMic
+            className={chatStyle["none"]}
+            record={recordState}
+            onStop={stopRecord}
           />
         </div>
       </div>

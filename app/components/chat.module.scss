@@ -1,5 +1,9 @@
 @import "../styles/animation.scss";
 
+.none {
+  display: none !important;
+}
+
 .chat-input-actions {
   display: flex;
   flex-wrap: wrap;

@@ -8,6 +8,7 @@ import {
   useChatStore,
 } from "./store";
 import { showToast } from "./components/ui-lib";
+import fs from "fs/promises";
 
 const TIME_OUT_MS = 60000;
 
@@ -60,6 +61,27 @@ function getHeaders() {
   }
 
   return headers;
+}
+
+export async function translations(audio: Blob) {
+  let audiobuff;
+  await audio
+    .stream()
+    .getReader()
+    .read()
+    .then(({ done, value }) => {
+      audiobuff = value;
+    });
+  const body = { audio64: Buffer.from(audiobuff?.buffer).toString("base64") };
+  return await fetch("/api/openai", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      path: "v1/audio/transcriptions",
+      ...getHeaders(),
+    },
+    body: body && JSON.stringify(body),
+  });
 }
 
 export function requestOpenaiClient(path: string) {
