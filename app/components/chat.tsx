@@ -585,7 +585,7 @@ export function Chat() {
   const [audioText, setAudioText] = useState("发送录音");
   const onAudioRecord = () => {
     console.log(`recordState:` + recordState);
-    setAudioText(recordState ? "点击结束录音" : "发送录音");
+    setAudioText(recordState ? "发送录音" : "点击结束录音");
     setRecordState(!recordState);
   };
   const stopRecord = async (recordedBlob) => {

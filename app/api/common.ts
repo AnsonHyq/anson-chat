@@ -45,7 +45,7 @@ export async function requestOpenai(req: NextRequest) {
         }),
       },
       method: req.method,
-      body: form,
+      body: form as any,
     });
   } else {
     return fetch(`${baseUrl}/${openaiPath}`, {
