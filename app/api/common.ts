@@ -33,8 +33,8 @@ export async function requestOpenai(req: NextRequest) {
     const bytes = Buffer.from(audio64, "base64");
     form.append(
       "file",
-      new Blob([bytes], { type: "audio/webm;codecs=opus" }),
-      `${Math.random()}.webm`,
+      new Blob([bytes], { type: "audio/wav" }),
+      `${Math.random()}.wav`,
     );
 
     return fetch(`${baseUrl}/${openaiPath}`, {

@@ -825,6 +825,7 @@ export function Chat() {
             className={chatStyle["none"]}
             record={recordState}
             onStop={stopRecord}
+            mimeType="audio/wav"
           />
         </div>
       </div>
