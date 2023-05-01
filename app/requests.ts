@@ -8,7 +8,6 @@ import {
   useChatStore,
 } from "./store";
 import { showToast } from "./components/ui-lib";
-import fs from "fs/promises";
 
 const TIME_OUT_MS = 60000;
 
@@ -64,7 +63,7 @@ function getHeaders() {
 }
 
 export async function translations(audio: Blob) {
-  let audiobuff;
+  let audiobuff: any;
   await audio
     .stream()
     .getReader()

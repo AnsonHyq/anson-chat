@@ -21,7 +21,6 @@ import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 
-import UploadIcon from "../icons/upload.svg";
 import { ReactMic } from "react-mic";
 
 import { translations } from "../requests";
@@ -588,14 +587,14 @@ export function Chat() {
     setAudioText(recordState ? "发送录音" : "点击结束录音");
     setRecordState(!recordState);
   };
-  const stopRecord = async (recordedBlob) => {
+  const stopRecord = async (recordedBlob: any) => {
     console.log(`recordedBlob  ` + recordedBlob.blob.size);
     const result = await translations(recordedBlob.blob);
     await result.body
       ?.getReader()
       .read()
       .then(({ done, value }) => {
-        const buffer = Buffer.from(value);
+        const buffer = Buffer.from(value as any);
         const audioinput = buffer.toString("utf8");
         setUserInput(JSON.parse(audioinput)["text"]);
       });
