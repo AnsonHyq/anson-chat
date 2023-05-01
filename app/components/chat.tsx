@@ -376,6 +376,7 @@ export function Chat() {
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
   const [recordState, setRecordState] = useState(false);
+  const [isAudioLoad, setIsAudioLoad] = useState(false);
 
   const onChatBodyScroll = (e: HTMLElement) => {
     const isTouchBottom = e.scrollTop + e.clientHeight >= e.scrollHeight - 20;
@@ -583,12 +584,15 @@ export function Chat() {
 
   const [audioText, setAudioText] = useState("发送录音");
   const onAudioRecord = () => {
-    console.log(`recordState:` + recordState);
-    setAudioText(recordState ? "发送录音" : "点击结束录音");
-    setRecordState(!recordState);
+    if (!isAudioLoad) {
+      setAudioText(recordState ? "发送录音" : "点击结束录音");
+      setRecordState(!recordState);
+    }
   };
   const stopRecord = async (recordedBlob: any) => {
     console.log(`recordedBlob  ` + recordedBlob.blob.size);
+    setIsAudioLoad(true);
+    setAudioText("正在转译...");
     const result = await translations(recordedBlob.blob);
     await result.body
       ?.getReader()
@@ -598,6 +602,8 @@ export function Chat() {
         const audioinput = buffer.toString("utf8");
         setUserInput(JSON.parse(audioinput)["text"]);
       });
+    setIsAudioLoad(false);
+    setAudioText("发送录音");
   };
   return (
     <div className={styles.chat} key={session.id}>
